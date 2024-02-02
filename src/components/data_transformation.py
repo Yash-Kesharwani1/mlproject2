@@ -16,10 +16,11 @@ from src.utils import save_object
 
 @dataclass
 class DataTransformationConfig:
-    proprocessor_obj_file_path = os.path.join('artifacts','preprocessor.pkl')
+    preprocessor_obj_file_path = os.path.join('artifacts','preprocessor.pkl')
 
 class DataTransformation:
-    def __init_(self):
+    
+    def __init__(self):
         self.data_transformation_config = DataTransformationConfig()
 
     def get_data_transformer_object(self):
@@ -95,13 +96,13 @@ class DataTransformation:
             target_feature_train_df = train_df[target_column_name]
 
             input_feature_test_df = test_df.drop(columns=[target_column_name],axis=1)
-            target_feature_test_df = test_df([target_column_name])
+            target_feature_test_df = test_df[target_column_name]
 
             logging.info(
                 f'Applying preprocessing object on training dataframe and testing dataframe.'
             )
 
-            input_feature_train_arr = preprocessing_obj.fit_transform(input_feature_test_df)
+            input_feature_train_arr = preprocessing_obj.fit_transform(input_feature_train_df)
             input_feature_test_arr = preprocessing_obj.transform(input_feature_test_df)
 
             train_arr = np.c_[
@@ -115,15 +116,16 @@ class DataTransformation:
 
             logging.info(f'Saved preprocessing object.')
 
+            # Utils
             save_object(
-                file_path=self.data_transformation_config.proprocessor_obj_file_path,
-                obj=preprocessing_obj
+                self.data_transformation_config.preprocessor_obj_file_path,
+                preprocessing_obj
             )
 
             return(
                 train_arr,
                 test_arr,
-                self.data_transformation_config.proprocessor_obj_file_path
+                self.data_transformation_config.preprocessor_obj_file_path
             )
         except Exception as e:
             raise CustomException(e,sys)
